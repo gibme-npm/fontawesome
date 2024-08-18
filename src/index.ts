@@ -22,112 +22,115 @@ import $ from 'jquery';
 import { Icon, Button } from './types';
 export * from './types';
 
-export default abstract class FontAwesome {
-    /**
-     * Creates a button with a fontawesome icon inside
-     *
-     * @param icon
-     * @param iconOptions
-     */
-    public static createButton <T extends HTMLElement = HTMLButtonElement> (
-        icon: string | string[],
-        iconOptions: Partial<Button.Options> = {}
-    ): JQuery<T> {
-        if (Array.isArray(icon)) {
-            icon = icon.join(' ');
+/**
+ * Creates a Font Awesome Icon
+ *
+ * Note: The icon name must be specified without the `fa-` prefix. If the icon includes
+ * multiple names (i.e. `fa-brand fa-x-twitter`) the icon should be specified as either
+ * `brand x-twitter` or `['brand','x-twitter']`
+ *
+ * @param icon
+ * @param options
+ */
+export const createIcon = <T extends HTMLElement = HTMLElement> (
+    icon: string | string[],
+    options: Partial<Icon.Options> = {}
+): JQuery<T> => {
+    options.style ??= 'solid';
+    options.animation ??= 'none';
+    options.rotation ??= 'none';
+    options.size ??= 'default';
+    options.attributes ??= {};
+
+    if (Array.isArray(icon)) {
+        icon = icon.join(' ');
+    }
+
+    // rework the icon in case of multiple specifiers
+    icon = icon.split(' ')
+        .map(elem => `fa-${elem}`)
+        .join(' ');
+
+    const element = $<T>('<i>')
+        .addClass(`fa-${options.style} ${icon}`);
+
+    if (options.animation !== 'none') {
+        // spin-reverse requires two classes
+        if (options.animation === 'spin-reverse') {
+            element.addClass('fa-spin fa-spin-reverse');
+        } else {
+            element.addClass(`fa-${options.animation}`);
         }
+    }
 
-        const button = $<T>('<button>')
-            .addClass('btn')
-            .attr('type', 'button');
+    if (options.rotation !== 'none' && options.animation === 'none') {
+        element.addClass(`fa-${options.rotation}`);
+    }
 
-        FontAwesome.createIcon(icon, iconOptions)
+    if (options.color) {
+        element.attr('style', `color: ${options.color}`);
+    }
+
+    if (options.size !== 'default') {
+        element.addClass(`fa-${options.size}`);
+    }
+
+    if (options.class) {
+        element.addClass(options.class);
+    }
+
+    for (const key in options.attributes) {
+        const value = options.attributes[key];
+
+        if (typeof value === 'boolean') {
+            if (value) {
+                element.attr(key, key);
+            }
+        } else if (typeof value === 'number') {
+            element.attr(key, value.toString());
+        } else {
+            element.attr(key, value);
+        }
+    }
+
+    return element;
+};
+
+/**
+ * Creates a button with a fontawesome icon inside
+ *
+ * @param icon
+ * @param iconOptions
+ */
+export const createButton = <T extends HTMLElement = HTMLButtonElement> (
+    icon: string | string[],
+    iconOptions: Partial<Button.Options> = {}
+): JQuery<T> => {
+    if (Array.isArray(icon)) {
+        icon = icon.join(' ');
+    }
+
+    const button = $<T>('<button>')
+        .addClass('btn')
+        .attr('type', 'button');
+
+    createIcon(icon, iconOptions)
+        .appendTo(button);
+
+    if (iconOptions.label && typeof iconOptions.label === 'string') {
+        $('<span>')
+            .text(` ${iconOptions.label}`)
             .appendTo(button);
-
-        if (iconOptions.label && typeof iconOptions.label === 'string') {
-            $('<span>')
-                .text(` ${iconOptions.label}`)
-                .appendTo(button);
-        } else if (iconOptions.label && typeof iconOptions.label !== 'string') {
-            iconOptions.label.appendTo(button);
-        }
-
-        return button;
+    } else if (iconOptions.label && typeof iconOptions.label !== 'string') {
+        iconOptions.label.appendTo(button);
     }
 
-    /**
-     * Creates a Font Awesome Icon
-     *
-     * Note: The icon name must be specified without the `fa-` prefix. If the icon includes
-     * multiple names (i.e. `fa-brand fa-x-twitter`) the icon should be specified as either
-     * `brand x-twitter` or `['brand','x-twitter']`
-     *
-     * @param icon
-     * @param options
-     */
-    public static createIcon<T extends HTMLElement = HTMLElement> (
-        icon: string | string[],
-        options: Partial<Icon.Options> = {}
-    ): JQuery<T> {
-        options.style ??= 'solid';
-        options.animation ??= 'none';
-        options.rotation ??= 'none';
-        options.size ??= 'default';
-        options.attributes ??= {};
+    return button;
+};
 
-        if (Array.isArray(icon)) {
-            icon = icon.join(' ');
-        }
+export const FontAwesome = {
+    createIcon,
+    createButton
+};
 
-        // rework the icon in case of multiple specifiers
-        icon = icon.split(' ')
-            .map(elem => `fa-${elem}`)
-            .join(' ');
-
-        const element = $<T>('<i>')
-            .addClass(`fa-${options.style} ${icon}`);
-
-        if (options.animation !== 'none') {
-            // spin-reverse requires two classes
-            if (options.animation === 'spin-reverse') {
-                element.addClass('fa-spin fa-spin-reverse');
-            } else {
-                element.addClass(`fa-${options.animation}`);
-            }
-        }
-
-        if (options.rotation !== 'none' && options.animation === 'none') {
-            element.addClass(`fa-${options.rotation}`);
-        }
-
-        if (options.color) {
-            element.attr('style', `color: ${options.color}`);
-        }
-
-        if (options.size !== 'default') {
-            element.addClass(`fa-${options.size}`);
-        }
-
-        if (options.class) {
-            element.addClass(options.class);
-        }
-
-        for (const key in options.attributes) {
-            const value = options.attributes[key];
-
-            if (typeof value === 'boolean') {
-                if (value) {
-                    element.attr(key, key);
-                }
-            } else if (typeof value === 'number') {
-                element.attr(key, value.toString());
-            } else {
-                element.attr(key, value);
-            }
-        }
-
-        return element;
-    }
-}
-
-export { FontAwesome };
+export default FontAwesome;
