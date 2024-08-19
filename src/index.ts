@@ -18,7 +18,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import $ from 'jquery';
 import { Icon, Button } from './types';
 export * from './types';
 
@@ -32,10 +31,10 @@ export * from './types';
  * @param icon
  * @param options
  */
-export const createIcon = <T extends HTMLElement = HTMLElement> (
+export const createIcon = (
     icon: string | string[],
     options: Partial<Icon.Options> = {}
-): JQuery<T> => {
+): HTMLElement => {
     options.style ??= 'solid';
     options.animation ??= 'none';
     options.rotation ??= 'none';
@@ -51,32 +50,33 @@ export const createIcon = <T extends HTMLElement = HTMLElement> (
         .map(elem => `fa-${elem}`)
         .join(' ');
 
-    const element = $<T>('<i>')
-        .addClass(`fa-${options.style} ${icon}`);
+    const element = document.createElement('i');
+    element.className = `fa-${options.style} ${icon}`;
 
     if (options.animation !== 'none') {
+        const { animation } = options;
         // spin-reverse requires two classes
-        if (options.animation === 'spin-reverse') {
-            element.addClass('fa-spin fa-spin-reverse');
+        if (animation === 'spin-reverse') {
+            element.classList.add('fa-spin', 'fa-spin-reverse');
         } else {
-            element.addClass(`fa-${options.animation}`);
+            element.classList.add(`fa-${animation}`);
         }
     }
 
-    if (options.rotation !== 'none' && options.animation === 'none') {
-        element.addClass(`fa-${options.rotation}`);
+    if (options.rotation !== 'none' && options.animation !== 'none') {
+        element.classList.add(`fa-${options.rotation}`);
     }
 
     if (options.color) {
-        element.attr('style', `color: ${options.color}`);
+        element.setAttribute('style', `color: ${options.color}`);
     }
 
     if (options.size !== 'default') {
-        element.addClass(`fa-${options.size}`);
+        element.classList.add(`fa-${options.size}`);
     }
 
     if (options.class) {
-        element.addClass(options.class);
+        element.classList.add(options.class);
     }
 
     for (const key in options.attributes) {
@@ -84,12 +84,12 @@ export const createIcon = <T extends HTMLElement = HTMLElement> (
 
         if (typeof value === 'boolean') {
             if (value) {
-                element.attr(key, key);
+                element.setAttribute(key, key);
             }
         } else if (typeof value === 'number') {
-            element.attr(key, value.toString());
+            element.setAttribute(key, value.toString());
         } else {
-            element.attr(key, value);
+            element.setAttribute(key, value);
         }
     }
 
@@ -102,27 +102,25 @@ export const createIcon = <T extends HTMLElement = HTMLElement> (
  * @param icon
  * @param iconOptions
  */
-export const createButton = <T extends HTMLElement = HTMLButtonElement> (
+export const createButton = (
     icon: string | string[],
     iconOptions: Partial<Button.Options> = {}
-): JQuery<T> => {
+): HTMLButtonElement => {
     if (Array.isArray(icon)) {
         icon = icon.join(' ');
     }
 
-    const button = $<T>('<button>')
-        .addClass('btn')
-        .attr('type', 'button');
-
-    createIcon(icon, iconOptions)
-        .appendTo(button);
+    const button = document.createElement('button');
+    button.classList.add('btn');
+    button.setAttribute('type', 'button');
+    button.appendChild(createIcon(icon, iconOptions));
 
     if (iconOptions.label && typeof iconOptions.label === 'string') {
-        $('<span>')
-            .text(` ${iconOptions.label}`)
-            .appendTo(button);
+        const span = document.createElement('span');
+        span.textContent = ` ${iconOptions.label}`;
+        button.appendChild(span);
     } else if (iconOptions.label && typeof iconOptions.label !== 'string') {
-        iconOptions.label.appendTo(button);
+        button.appendChild(iconOptions.label);
     }
 
     return button;

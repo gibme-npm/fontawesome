@@ -52,7 +52,7 @@ export namespace Button {
      * Font Awesome Button Options set
      */
     export interface Options extends Icon.Options {
-        label: string | JQuery<HTMLElement>;
+        label: string | HTMLElement;
 
         [key: string]: any;
     }
