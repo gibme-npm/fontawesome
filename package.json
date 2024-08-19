@@ -1,6 +1,6 @@
 {
   "name": "@gibme/fontawesome",
-  "version": "0.9.2",
+  "version": "0.9.3",
   "description": "Simple utilities for fontawesome",
   "main": "./dist/index.js",
   "types": "./dist/index.ts",
