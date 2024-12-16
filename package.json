@@ -1,6 +1,6 @@
 {
   "name": "@gibme/fontawesome",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "description": "Simple utilities for fontawesome",
   "main": "./dist/index.js",
   "types": "./dist/index.ts",
@@ -47,7 +47,7 @@
     }
   },
   "devDependencies": {
-    "@gibme/auto-pack": "^0.4.3",
+    "@gibme/auto-pack": "^0.4.6",
     "@types/mocha": "^10.0.6",
     "@types/node": "^20.11.8",
     "@typescript-eslint/eslint-plugin": "^6.19.1",
