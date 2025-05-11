@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Brandon Lehmann <brandonlehmann@gmail.com>
+// Copyright (c) 2024-2025, Brandon Lehmann <brandonlehmann@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -18,9 +18,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import { Icon, Button } from './types';
-export * from './types';
-
 /**
  * Creates a Font Awesome Icon
  *
@@ -33,7 +30,7 @@ export * from './types';
  */
 export const createIcon = (
     icon: string | string[],
-    options: Partial<Icon.Options> = {}
+    options: Partial<FontAwesome.Icon.Options> = {}
 ): HTMLElement => {
     options.style ??= 'solid';
     options.animation ??= 'none';
@@ -104,7 +101,7 @@ export const createIcon = (
  */
 export const createButton = (
     icon: string | string[],
-    iconOptions: Partial<Button.Options> = {}
+    iconOptions: Partial<FontAwesome.Button.Options> = {}
 ): HTMLButtonElement => {
     if (Array.isArray(icon)) {
         icon = icon.join(' ');
@@ -126,9 +123,52 @@ export const createButton = (
     return button;
 };
 
-export const FontAwesome = {
+const FontAwesome = {
     createIcon,
     createButton
 };
+
+export namespace FontAwesome {
+    export type Color = `rgb(${number},${number},${number})`
+        | `rgba(${number},${number},${number},${number})`
+        | `#${string}`;
+
+    export type Animation = 'none' | 'beat' | 'beat-fade' | 'bounce' | 'fade'
+        | 'flip' | 'shake' | 'spin' | 'spin-reverse' | 'spin-pulse';
+
+    export type Rotation = 'none' | 'rotate-90' | 'rotate-180' | 'rotate-270'
+        | 'flip-horizontal' | 'flip-vertical' | 'flip-both';
+
+    export namespace Icon {
+        type Style = 'solid' | 'regular' | 'light' | 'duotone' | 'thin';
+
+        type Size = 'default' | '2xs' | 'xs' | 'lg' | 'xl' | '2xl';
+
+        /**
+         * Font Awesome Option set
+         */
+        export interface Options {
+            class: string;
+            style: Style;
+            animation: Animation;
+            rotation: Rotation;
+            size: Size;
+            color: Color;
+            attributes: Record<string, string | number | boolean>;
+        }
+    }
+
+    export namespace Button {
+        /**
+         * Font Awesome Button Options set
+         */
+        export interface Options extends Icon.Options {
+            label: string | HTMLElement;
+
+            [key: string]: any;
+        }
+    }
+
+}
 
 export default FontAwesome;
